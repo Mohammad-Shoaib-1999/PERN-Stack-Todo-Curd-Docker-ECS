@@ -1,6 +1,3 @@
-Certainly! Here's the content converted into Markdown format for a README file:
-
-```markdown
 # Building a CRUD Todo App with PERN Stack and Docker
 
 ## Introduction
@@ -92,4 +89,3 @@ In this tutorial, you have learned how to create a Todo application using the PE
 - [Docker Compose Documentation](https://docs.docker.com/compose/)
 ```
 
-Feel free to customize the formatting or add any additional information as needed.
