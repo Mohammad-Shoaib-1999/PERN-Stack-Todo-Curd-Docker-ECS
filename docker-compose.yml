@@ -1,0 +1,56 @@
+version: "3.7"
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_DB: pern_todo_database
+      POSTGRES_USER: mohamad
+      POSTGRES_PASSWORD: pg_database
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - my-app-network
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    image: myapp-server
+    container_name: server
+    command: npm run dev
+    ports:
+      - "9000:9000"
+    depends_on:
+      - postgres
+    environment:
+      - PSQL_HOST=postgres
+      - PSQL_USER=mohamad
+      - PSQL_PASSWORD=pg_database
+      - PSQL_NAME=pern_todo_database
+      - PSQL_PORT=5432
+    networks:
+      - my-app-network
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    image: myapp-client
+    container_name: client
+    command: npm run dev
+    ports:
+      - "5173:5173"
+    depends_on:
+      - server
+    networks:
+      - my-app-network
+
+networks:
+  my-app-network:
+    driver: bridge
+volumes:
+  postgres_data:

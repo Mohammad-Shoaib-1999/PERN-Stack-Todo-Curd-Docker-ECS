@@ -20,4 +20,4 @@ RUN npm install
 EXPOSE 9000
 
 # Command to run the application when the container starts
-CMD ["node", "index.js"]
+CMD ["npm", "run", "dev"]

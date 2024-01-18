@@ -1,9 +1,9 @@
 require("dotenv").config();
 const { Pool } = require("pg");
 
-const database = process.env.PGDATABASE;
+const database = process.env.PSQL_NAME;
 
-const connectionString = `postgresql://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:${process.env.PGPORT}/${database}`;
+const connectionString = `postgresql://${process.env.PSQL_USER}:${process.env.PSQL_PASSWORD}@${process.env.PSQL_HOST}:${process.env.PSQL_PORT}/${database}`;
 
 const pool = new Pool({
   connectionString: connectionString,
