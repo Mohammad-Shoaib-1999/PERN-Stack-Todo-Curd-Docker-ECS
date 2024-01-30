@@ -1,0 +1,651 @@
+Get Started with the PERN Stack: An Introduction and Implementation Guide
+https://medium.com/@ritapalves/get-started-with-the-pern-stack-an-introduction-and-implementation-guide-e33c55d09994
+
+docker run --name postgres -e POSTGRES_USER=mohamad -e POSTGRES_PASSWORD=pg_database -p 5432:5432 -d postgres:latest
+docker run --name pgdatabase -e POSTGRES_USER=mohamad -e POSTGRES_PASSWORD=your_password -p 5432:5432 -d postgres  
+ --- Run a PostgreSQL container with the specified user and password. - Create `Dockerfile` in both the server and client directories. - Create `.dockerignore` files in both server and client to ignore `node_modules`.
+docker cp ./path/to/init.sql pgdatabase:/tmp/init.sql
+--- Create a SQL script (`init.sql`) to create tables and seed data & Copy the script to the PostgreSQL container:
+docker exec -ti pgdatabase /bin/bash -c "psql -U mohamad -d your_database -f /tmp/init.sql"
+--- Execute the script inside the container:
+docker build -t server:latest .
+docker build -t client:latest . --- Build Docker images for the server and client.
+docker run --name server-container -p 9000:9000 -d server
+docker run --name client-container -p 3000:3000 -d client --- Create Docker containers for the server and client
+docker network create pern-network --- Create a Docker bridge network
+docker network connect pern-network server-container
+docker network connect pern-network client-container --- Connect server and client containers to the created network.
+
+---
+
+# PostgreSQL Database Configuration
+
+    DB_HOST=postgres
+    DB_PORT=5432
+    DB_USER=your_db_user
+    DB_PASSWORD=your_db_password
+    DB_NAME=your_db_name
+
+1. Ensure that the `DB_HOST` in the server's .env file matches the service name specified in the docker-compose.yml file (`DB_HOST=postgres`).
+
+2. The `REACT_APP_API_URL` in the client's .env file should point to the URL where your Express.js server is accessible. In this example, it assumes the server is running on `http://localhost:5000`.
+
+3. Adjust these configurations based on your actual setup and requirements.
+
+---
+
+Certainly! Here's an extended todo list with additional commands and explanations for managing the PERN Stack project, especially focusing on Docker-related tasks:
+
+### Docker-Related Commands
+
+### Step 1: Project Structure
+
+docker-compose up --build --- Build and run the defined services using Docker Compose.
+docker-compose down --- Stop and remove containers, networks, and volumes defined in the `docker-compose.yml` file.
+docker-compose logs --- View logs of running containers.
+docker network inspect pern-network --- Inspect details of the created Docker network.
+docker inspect <container-name> --- Inspect IP addresses and details of running containers.
+  docker exec -ti pgdatabase /bin/bash --- docker exec -ti pgdatabase /bin/bash
+docker exec -ti server-container /bin/bash --- Establish a bash session inside the Node.js server container.
+docker exec -ti client-container /bin/bash --- Establish a bash session inside the React client container.
+docker system prune --- Remove all unused Docker resources.
+docker rmi <image-name> --- Remove a specific Docker image.
+docker ps --- View details of currently running containers.
+
+---
+
+### Docker Commands Cheat Sheet
+
+docker version`**   					- Check Docker version and info about the installed binaries and runtime.
+docker info`** - Display Docker system-wide information.
+docker pull <image>`** - Download a Docker image from Docker Hub.
+docker images`** 					- List all locally stored Docker images.
+docker ps`** - List running containers.
+docker ps -a`** - List all containers, including stopped ones.
+docker run <options> <image>`**  			- Create and start a container from an image.
+docker run -d -p 8080:80 nginx 				- Example: Run an Nginx container in detached mode, mapping port 8080 on the host to port 80 in the container.
+docker exec -it <container> <command>`** - Run a command inside a running container.
+docker exec -it my-container bash - Example: Open a bash shell inside a running container named "my-container".
+docker build -t <image-name> <path>`** - Build a Docker image from a Dockerfile.
+docker build -t my-node-app . - Example: Build an image named "my-node-app" from the current directory.
+docker stop <container>`**   				- Stop a running container.
+docker rm <container>`** - Remove a stopped container.
+docker rmi <image>`** - Remove a Docker image.
+docker network create <network-name>`**   		- Create a custom Docker network.
+docker volume create <volume-name>`\* - Create a Docker volume for persistent storage.
+docker-compose up -d`**    				- Start services defined in `docker-compose.yml` in detached mode.
+docker-compose down`** - Stop and remove services defined in `docker-compose.yml`.
+docker system prune`** - Remove all unused containers, networks, and images.
+docker inspect <object>`**  				- Display detailed information about a Docker object (container, image, network).
+docker logs <container>`** - View logs of a running container.
+docker exec -it <container> /bin/bash`** - Open a bash shell inside a running container for debugging.
+docker-compose logs`**   				- View logs of services defined in `docker-compose.yml`.
+docker-compose ps`** - List services and their status in a Docker Compose project.
+docker-compose exec <service> <command>`** - Run a command inside a service defined in `docker-compose.yml`.
+docker-compose exec webserver ls /var/www - Example: List contents of `/var/www` inside the "webserver" service.
+
+---
+
+Certainly! Below are the steps to achieve this:
+
+### Step 1: Create a Docker Compose file (`docker-compose.yml`)
+
+Create a `docker-compose.yml` file to define the PostgreSQL service and its configurations. Also, mount a volume to copy the SQL script into the container.
+
+```yaml
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: perntodo-postgres
+    environment:
+      POSTGRES_DB: perntodo
+      POSTGRES_USER: postgres_user
+      POSTGRES_PASSWORD: postgres_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./init-scripts:/docker-entrypoint-initdb.d
+
+volumes:
+  postgres_data:
+```
+
+Replace `postgres_user` and `postgres_password` with your desired PostgreSQL username and password. The SQL script will be copied from the `./init-scripts` directory.
+
+### Step 2: Create a Directory for SQL Script
+
+Create a directory named `init-scripts` in the same directory as your `docker-compose.yml`. Inside this directory, create a file named `init.sql` with the following content:
+
+```sql
+-- init.sql
+CREATE DATABASE perntodo;
+\c perntodo;
+
+CREATE TABLE IF NOT EXISTS todos (
+    todo_id SERIAL PRIMARY KEY,
+    description VARCHAR(255)
+);
+```
+
+### Step 3: Build and Run the Docker Compose
+
+Run the following commands in your terminal:
+
+```bash
+docker-compose up -d
+```
+
+This will download the PostgreSQL image, create a container, and execute the SQL script to initialize the database.
+
+### Step 4: Connect to PostgreSQL
+
+You can connect to the PostgreSQL database using your preferred PostgreSQL client (e.g., pgAdmin, DBeaver) using the provided credentials (`postgres_user`, `postgres_password`, `perntodo` as the database name).
+
+Now, the PostgreSQL container is running with the specified database and table structure. The SQL script is executed during the container initialization.
+
+---
+
+require("dotenv").config();
+
+const Sequelize = require("sequelize");
+
+const sequelize = new Sequelize(
+process.env.PSQL_NAME || "postgres",
+process.env.PSQL_USER || "postgres",
+process.env.PSQL_PASSWORD || "",
+{
+host: "localhost",
+port: process.env.PSQL_PORT || 5432,
+dialect: "postgres",
+logging: false, // Disable logging SQL queries to the console
+}
+);
+
+const Todos = sequelize.define("Todos", {
+id: {
+type: Sequelize.INTEGER,
+primaryKey: true,
+autoIncrement: true,
+},
+description: {
+type: Sequelize.STRING,
+allowNull: true,
+},
+});
+
+module.exports = {
+sequelize: sequelize,
+Todos: Todos,
+};
+
+require("dotenv").config();
+
+const Sequelize = require("sequelize");
+
+const sequelize = new Sequelize(
+process.env.PSQL_NAME || "postgres",
+process.env.PSQL_USER|| "postgres",
+process.env.PSQL_PASSWORD || "",
+{
+host: process.env.PSQL_HOST || "localhost",
+port: process.env.PSQL_PORT || 5432,
+// dialect: "postgres",
+// dialectOptions: {
+// ssl: process.env.DB_SSL == "true",
+// },
+}
+);
+
+const Todos = sequelize.define('Todos', {
+id: {
+type: Sequelize.INTEGER,
+primaryKey: true,
+autoIncrement: true
+},
+description: {
+type: Sequelize.STRING,
+allowNull: true
+},
+});
+module.exports = {
+sequelize: sequelize,
+Todos: Todos
+};
+
+// require("dotenv").config();
+// const { Pool } = require("pg");
+
+// const database = process.env.PSQL_NAME;
+
+// const connectionString = `postgresql://${process.env.PSQL_USER}:${process.env.PSQL_PASSWORD}@${process.env.PSQL_HOST}:${process.env.PSQL_PORT}/${database}`;
+
+// const pool = new Pool({
+// connectionString: connectionString,
+// });
+
+// module.exports = {
+// query: (text, params) => pool.query(text, params),
+// end: () => pool.end(),
+// };
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------Certainly! Here's a PostgreSQL commands cheat sheet using the example of a CRUD Todo app:
+
+### PostgreSQL Commands Cheat Sheet
+
+1. **Connect to PostgreSQL:**
+   psql -U <username> -d <database> - Connect to a PostgreSQL database with the specified username and database.
+2. **List Databases:**
+   \l - List all databases in the PostgreSQL server.
+3. **Create Database:**
+   CREATE DATABASE <database>; - Create a new database for the Todo app.
+4. **Connect to Database:**
+   \c <database> - Connect to a specific database.
+5. **Create Todo Table:**
+   CREATE TABLE todos (
+   id SERIAL PRIMARY KEY,
+   task VARCHAR(255) NOT NULL,
+   completed BOOLEAN DEFAULT FALSE
+   ); - Create a table named "todos" to store Todo items.
+6. **Insert Todo:**
+   INSERT INTO todos (task) VALUES ('Example Task'); - Insert a new Todo item into the "todos" table.
+7. **Select Todos:**
+   SELECT \* FROM todos; - Retrieve all Todo items from the "todos" table.
+8. **Update Todo:**
+   UPDATE todos SET completed = TRUE WHERE id = 1; - Update the completion status of a Todo item.
+9. **Delete Todo:**
+   DELETE FROM todos WHERE id = 1; - Delete a Todo item from the "todos" table.
+10. **Select Completed Todos:**
+    SELECT \* FROM todos WHERE completed = TRUE; - Retrieve all completed Todo items.
+11. **Select Incomplete Todos:**
+    SELECT \* FROM todos WHERE completed = FALSE; - Retrieve all incomplete Todo items.
+12. **Drop Todo Table:**
+    DROP TABLE todos; - Delete the "todos" table and its data.
+13. **Delete Database:**
+    DROP DATABASE <database>; - Delete the entire database.
+14. **Exit psql:** \q - Exit the PostgreSQL interactive terminal.
+
+
+
+1. **List Tables:**  
+   \dt   - List all tables in the current database.
+2. **Describe Table:**
+   \d <table_name>   - Show the structure of a specific table.
+3. **Backup Database:**
+   pg_dump -U <username> -d <database> > backup.sql   - Create a backup of the entire database.
+4. **Restore Database:**
+   psql -U <username> -d <database> < backup.sql   - Restore a database from a previously created backup.
+5. **Show Users:**
+   \du   - List all database users.
+6. **Grant Permissions:**
+   GRANT ALL PRIVILEGES ON DATABASE <database> TO <username>;   - Grant full access privileges on a database to a user.
+7. **Revoke Permissions:**
+   REVOKE ALL PRIVILEGES ON DATABASE <database> FROM <username>;   - Revoke access privileges on a database from a user.
+8. **Create User:**
+   CREATE USER <username> WITH PASSWORD '<password>';   - Create a new database user.
+9. **Alter User:**
+    ALTER USER <username> WITH SUPERUSER;   - Modify user properties, e.g., grant superuser status.
+10. **Show Current User:**
+    SELECT current_user;   - Display the currently connected user.
+11. **Create Index:**
+    CREATE INDEX idx_task ON todos (task);    - Create an index on a specific column for faster queries.
+12. **Vacuum Database:**
+    VACUUM;    - Reclaim storage occupied by dead rows and optimize the database.
+13. **Show Query Execution Plan:**
+     EXPLAIN SELECT * FROM todos;    - Display the execution plan of a query.
+14. **Show Server Version:**
+    SELECT version();    - Retrieve information about the PostgreSQL server version.
+15. **Enable Timing of Queries:**
+    \timing    - Enable timing information for query execution.
+
+
+
+
+Certainly! Here's a cheat sheet for some common Sequelize functions:
+
+1. **Define a Model:**
+   ```javascript
+   const Sequelize = require('sequelize');
+   const { DataTypes } = Sequelize;
+
+   const User = sequelize.define('User', {
+     // attributes
+     firstName: {
+       type: DataTypes.STRING,
+       allowNull: false,
+     },
+     lastName: {
+       type: DataTypes.STRING,
+       // allowNull defaults to true
+     },
+     email: {
+       type: DataTypes.STRING,
+       unique: true,
+     },
+   }, {
+     // options
+   });
+   ```
+
+2. **Sync Models with Database:**
+   ```javascript
+   await sequelize.sync();
+   // This will create the `User` table if it doesn't exist.
+   ```
+
+3. **Create a Record:**
+   ```javascript
+   const newUser = await User.create({
+     firstName: 'John',
+     lastName: 'Doe',
+     email: 'john@example.com',
+   });
+   ```
+
+4. **Bulk Create Records:**
+   ```javascript
+   const users = [
+     { firstName: 'John', lastName: 'Doe', email: 'john@example.com' },
+     { firstName: 'Jane', lastName: 'Doe', email: 'jane@example.com' },
+   ];
+
+   const newUsers = await User.bulkCreate(users);
+   ```
+
+5. **Find All Records:**
+   ```javascript
+   const allUsers = await User.findAll();
+   ```
+
+6. **Find Records with Conditions:**
+   ```javascript
+   const johns = await User.findAll({
+     where: {
+       firstName: 'John',
+     },
+   });
+   ```
+
+7. **Update a Record:**
+   ```javascript
+   const userToUpdate = await User.findByPk(1);
+   userToUpdate.firstName = 'UpdatedJohn';
+   await userToUpdate.save();
+   ```
+
+8. **Delete a Record:**
+   ```javascript
+   const userToDelete = await User.findByPk(1);
+   await userToDelete.destroy();
+   ```
+
+9. **Association - Define Relationships:**
+   ```javascript
+   const Task = sequelize.define('Task', {
+     // task attributes
+   });
+
+   User.hasMany(Task);
+   Task.belongsTo(User);
+   ```
+
+10. **Include Associated Models in Query:**
+    ```javascript
+    const userWithTasks = await User.findOne({
+      where: { id: 1 },
+      include: Task,
+    });
+    ```
+
+11. **Transaction:**
+    ```javascript
+    const transaction = await sequelize.transaction();
+    
+    try {
+      // perform multiple operations within this transaction
+      await User.create({ firstName: 'John' }, { transaction });
+      await Task.create({ description: 'Task 1' }, { transaction });
+      
+      // commit the transaction
+      await transaction.commit();
+    } catch (error) {
+      // rollback the transaction if any operation fails
+      await transaction.rollback();
+    }
+    ```
+
+12. **Query Raw SQL:**
+    ```javascript
+    const [results, metadata] = await sequelize.query('SELECT * FROM Users');
+    ```
+
+13. **Pagination:**
+    ```javascript
+    const pageSize = 10;
+    const pageNumber = 1;
+    
+    const users = await User.findAll({
+      limit: pageSize,
+      offset: (pageNumber - 1) * pageSize,
+    });
+    ```
+
+These are just some basic Sequelize functions. Sequelize provides many more functions and options for handling complex scenarios. Adjust these based on your specific use case and requirements.
+
+Certainly! Here's a cheat sheet for Sequelize functions that are commonly used in handling complex scenarios:
+
+1. **Query with Where Clause:**
+   ```javascript
+   const users = await User.findAll({
+     where: {
+       age: {
+         [Op.gte]: 21,
+       },
+     },
+   });
+   ```
+
+2. **Ordering Results:**
+   ```javascript
+   const orderedUsers = await User.findAll({
+     order: [
+       ['createdAt', 'DESC'],
+       ['firstName', 'ASC'],
+     ],
+   });
+   ```
+
+3. **Grouping Results:**
+   ```javascript
+   const groupedUsers = await User.findAll({
+     attributes: ['gender', [sequelize.fn('COUNT', sequelize.col('gender')), 'genderCount']],
+     group: ['gender'],
+   });
+   ```
+
+4. **Aggregations:**
+   ```javascript
+   const avgAge = await User.findAll({
+     attributes: [[sequelize.fn('AVG', sequelize.col('age')), 'averageAge']],
+   });
+   ```
+
+5. **Joins:**
+   ```javascript
+   const userWithTasks = await User.findOne({
+     where: { id: 1 },
+     include: Task,
+   });
+   ```
+
+6. **Subqueries:**
+   ```javascript
+   const usersWithTasks = await User.findAll({
+     where: {
+       id: {
+         [Op.in]: sequelize.literal('(SELECT userId FROM Tasks WHERE completed = true)'),
+       },
+     },
+   });
+   ```
+
+7. **Conditional Include:**
+   ```javascript
+   const user = await User.findByPk(1, {
+     include: [
+       {
+         model: Task,
+         where: {
+           completed: true,
+         },
+       },
+     ],
+   });
+   ```
+
+8. **Multiple Conditions:**
+   ```javascript
+   const users = await User.findAll({
+     where: {
+       [Op.and]: [
+         { age: { [Op.gte]: 21 } },
+         { gender: 'female' },
+       ],
+     },
+   });
+   ```
+
+9. **Using Raw SQL:**
+   ```javascript
+   const [results, metadata] = await sequelize.query('SELECT * FROM Users WHERE age > :age', {
+     replacements: { age: 21 },
+     type: sequelize.QueryTypes.SELECT,
+   });
+   ```
+
+10. **Pagination:**
+    ```javascript
+    const pageSize = 10;
+    const pageNumber = 1;
+    
+    const users = await User.findAll({
+      limit: pageSize,
+      offset: (pageNumber - 1) * pageSize,
+    });
+    ```
+
+11. **Transactions:**
+    ```javascript
+    const transaction = await sequelize.transaction();
+    
+    try {
+      // perform multiple operations within this transaction
+      await User.create({ firstName: 'John' }, { transaction });
+      await Task.create({ description: 'Task 1' }, { transaction });
+      
+      // commit the transaction
+      await transaction.commit();
+    } catch (error) {
+      // rollback the transaction if any operation fails
+      await transaction.rollback();
+    }
+    ```
+
+12. **Hooks (Lifecycle Events):**
+    ```javascript
+    const User = sequelize.define('User', {
+      firstName: DataTypes.STRING,
+      lastName: DataTypes.STRING,
+    }, {
+      hooks: {
+        beforeCreate: (user, options) => {
+          user.firstName = 'Hooked' + user.firstName;
+        },
+      },
+    });
+    ```
+
+Remember to customize these functions based on your specific use case and database structure. Sequelize provides a powerful set of tools for handling complex scenarios in a database-agnostic way.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// import config from "./index";
+
+// const { secrets, dbVariables } = config();
+
+// module.exports = {
+//   development: {
+//     username: secrets.username,
+//     password: secrets.password,
+//     database: secrets.name,
+//     host: secrets.host,
+//     port: secrets.port,
+//     dialect: "postgres",
+//     dialectOptions: {
+//       bigNumberStrings: true,
+//     },
+//     databases: {
+     
+//       Auth: {
+//         username: dbVariables.dbAuthUsername,
+//         password: dbVariables.dbAuthPassword,
+//         database: dbVariables.dbAuthName,
+//         host: dbVariables.dbAuthHost,
+//         port: 5432,
+//         dialect: "postgres",
+//         dialectOptions: {
+//           bigNumberStrings: true,
+//         },
+//       },
+//        Company: {
+//         username: dbVariables.dbCompanyUsername,
+//         password: dbVariables.dbCompanyPassword,
+//         database: dbVariables.dbCompanyName,
+//         host: dbVariables.dbCompanyHost,
+//         port: 5432,
+//         dialect: "postgres",
+//         dialectOptions: {
+//           bigNumberStrings: true,
+//         },
+//       },
+//       Task: {
+//         username: dbVariables.dbTaskUsername,
+//         password: dbVariables.dbTaskPassword,
+//         database: dbVariables.dbTaskName,
+//         host: dbVariables.dbTaskHost,
+//         port: 5432,
+//         dialect: "postgres",
+//         dialectOptions: {
+//           bigNumberStrings: true,
+//         },
+//       },
+
+     
+//     },
+//   },
+// };

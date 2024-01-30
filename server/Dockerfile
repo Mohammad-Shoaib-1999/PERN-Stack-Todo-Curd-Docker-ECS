@@ -17,7 +17,7 @@ USER node
 RUN npm install
 
 # Expose port 9000 for the application
-EXPOSE 9000
+EXPOSE 8000
 
 # Command to run the application when the container starts
 CMD ["npm", "run", "dev"]

@@ -1,0 +1,28 @@
+{
+  "development": {
+    "username": "mohamad",
+    "password": "pg_database",
+    "database": "database_development",
+    "host": "localhost",
+    "port":5432,
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": "mohamad",
+    "password": "pg_database",
+    "database": "database_test",
+    "host": "localhost",
+    "port":5432,
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "mohamad",
+    "password": "pg_database",
+    "database": "database_production",
+    "host": "localhost",
+    "port":5432,
+    "dialect": "postgres"
+  }
+}
+
+
