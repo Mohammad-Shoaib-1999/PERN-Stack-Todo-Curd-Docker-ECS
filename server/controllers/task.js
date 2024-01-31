@@ -68,3 +68,4 @@ self.deleteAll = async (req, res, next) => {
 };
 
 module.exports = self;
+

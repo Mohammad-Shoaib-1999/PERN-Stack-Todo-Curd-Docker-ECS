@@ -1,0 +1,65 @@
+import Text from "../text/Text";
+
+const Accordion = ({
+  accordionKey,
+  activeKey,
+  setActive,
+  fallback,
+  icon,
+  label,
+  children,
+  isLoading,
+}) => {
+  if (isLoading) {
+    return (<h1>Loading....</h1>);
+  }
+
+  const isActive = activeKey === accordionKey;
+
+  const toggleAccordion = () => {
+    if (isActive) {
+      setActive(undefined);
+    } else {
+      setActive(accordionKey);
+    }
+  };
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        padding: "12px 24px",
+        gap: "12px",
+        alignItems: "start",
+        borderBottom: "1px solid #d9d9d9",
+      }}
+    >
+      <div style={{ marginTop: "1px", flexShrink: 0 }}>{icon}</div>
+      {isActive ? (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "12px",
+            flex: 1,
+          }}
+        >
+          <div
+            // strong
+            onClick={toggleAccordion}
+            style={{ cursor: "pointer" }}
+          >
+            {label}
+          </div>
+          {children}
+        </div>
+      ) : (
+        <Text onClick={toggleAccordion} style={{ cursor: "pointer", flex: 1 }}>
+          {fallback}
+        </Text>
+      )}
+    </div>
+  );
+};
+
+export default Accordion;

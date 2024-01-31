@@ -1,5 +1,24 @@
 Get Started with the PERN Stack: An Introduction and Implementation Guide
 https://medium.com/@ritapalves/get-started-with-the-pern-stack-an-introduction-and-implementation-guide-e33c55d09994
+SEQUALIZE
+https://dev.to/nedsoft/getting-started-with-sequelize-and-postgres-emp
+https://dev.to/nedsoft
+https://itswagi.medium.com/how-to-get-started-with-express-sequelize-and-passport-cc405391a3de
+https://medium.com/@ahsankhaleeq10/how-to-use-postgresql-with-sequelize-in-node-js-1bed818c9f02
+AUTH
+https://dev.to/muhammadabir/jwt-passportjs-authentication-40ka
+https://dev.to/jnmedinadev/a-guide-to-setting-up-passportjs-google-strategy-with-postgresql-express-react-and-nodejs-2e7d
+https://dev.to/shreshthgoyal/user-authorization-in-nodejs-using-postgresql-4gl
+CURD
+https://medium.com/@vinayak-singh/creating-crud-apis-with-node-js-and-sequelize-cli-8b90e8784422
+https://blog.logrocket.com/crud-rest-api-node-js-express-postgresql/
+ERROR HANDLER
+https://dev.to/qbentil/how-to-write-custom-error-handler-middleware-in-expressjs-using-javascript-29j1
+MULTIPLE DATABASE
+https://javascript.plainenglish.io/connecting-to-multiple-databases-with-nodejs-and-sequelize-4cd9224e6a4d
+https://javascript.plainenglish.io/connecting-to-multiple-databases-with-nodejs-and-sequelize-4cd9224e6a4d
+KANBAN
+https://dev.to/kliton/build-a-drag-and-drop-kanban-board-react-typescript-tailwind-dnd-kit-5p4
 
 docker run --name postgres -e POSTGRES_USER=mohamad -e POSTGRES_PASSWORD=pg_database -p 5432:5432 -d postgres:latest
 docker run --name pgdatabase -e POSTGRES_USER=mohamad -e POSTGRES_PASSWORD=your_password -p 5432:5432 -d postgres  
